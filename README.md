@@ -15,9 +15,10 @@ Note: demonstrated here is a way efficiently parallelize these tests using Spark
 # Source Data and References
 
 Datasets analyzed here are derived from those at:
+
 (http://jungle.unige.ch/rnaseq_CEU60/)
-Cited in the paper:
-(http://www.nature.com/nature/journal/v464/n7289/pdf/nature08903.pdf)
+
+Cited in the paper: (http://www.nature.com/nature/journal/v464/n7289/pdf/nature08903.pdf)
 
 #Building
 
