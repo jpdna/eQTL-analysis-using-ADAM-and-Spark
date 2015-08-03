@@ -10,7 +10,9 @@ In statistical genetics, associations tests are performed between genotype and p
 
 In this demonstration program, genotypes are formated into the efficient ADAM genotype format using Parquet and then Spark is used to perform hundreds of millions of linear regression tests.  
 
-Note: demonstrated here is a way efficiently parallelize these tests using Spark - next corrections need to be made to ascertain signfificance based of prior hypothesis or otherwise limit the number of tests considered.  An adaptive machine learning approach also using Spark may be a good option to narrow this search space.
+The genetic association test here is equally applicable to whole body QTLs like height, BMI, blood pressure, eQTLs were chosen as they sheet amount of computation requires a scalable solution.  Another area where Spark could be applied isthe pairwise and greater interaction among variants, which quickly also produces a combinatorial explosion of tests.
+
+Note: demonstrated here is a way to efficiently parallelize these statistical tests using Spark, however scientific interpretation requires adjustment for the many millions of tests performed.  Corrections need to be made to ascertain signfificance based on prior hypothesis or otherwise the number of tests need to limited - often first (cis-acting) eQTLs are considered where the variant is in or near the gene for which expression is being tested for association.  An adaptive machine learning approach also using Spark may be a good option to narrow this search space, or to adaptively expand the search based on network analysis.
 
 # Source Data and References
 
