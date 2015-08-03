@@ -6,7 +6,18 @@ gene expression phenotypes (eQTLs), making use of ADAM Parquet Genotype file for
 as a scalable engine to execute hundreds of millions of statistical tests - making use of multiple processors
 and scaling linearly across a cluster such as amazon EC2
 
+In statistical genetics, associations tests are performed between genotype and phenotype.  In the case of a continuous trait such as height, linear regression can be used to associate the dosage (zero,1, or two copies) of an alternative allele at a position in the genome with the quantitative trait.  Over the past decade it has become possible to measure simultaneously thousands of molecular gene expression phenotypes, the amount of a gene transcript made by a cells (or a cultured cell line) derived from a specific person, and to associate that molecular phenotype with genetic variation within a sample population.   Thes studies are often termed (eQTL) for expression quantitative trait loci studies.
+
+In this demonstration program, genotypes are formated into the efficient ADAM genotype format using Parquet and then Spark is used to perform hundreds of millions of linear regression tests.  
+
+Note: demonstrated here is a way efficiently parallelize these tests using Spark - next corrections need to be made to ascertain signfificance based of prior hypothesis or otherwise limit the number of tests considered.  An adaptive machine learning approach also using Spark may be a good option to narrow this search space.
+
 # Source Data and References
+
+Datasets analyzed here are derived from those at:
+(http://jungle.unige.ch/rnaseq_CEU60/)
+Cited in the paper:
+(http://www.nature.com/nature/journal/v464/n7289/pdf/nature08903.pdf)
 
 #Building
 
