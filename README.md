@@ -30,7 +30,7 @@ Described in the paper: (http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3836232/)
 #Building
 
 To build from source first [download and install Maven](http://maven.apache.org/download.cgi).
-Then at the command line type:
+Then at the command line in this cloned repository type:
 
 ```
 mvn clean package
@@ -41,7 +41,7 @@ This will produce the JAR file target/uberScalajar-Spark_eQTL_assoc-0.1-SNAPSHOT
 #Running
 Download Spark version 1.2.0 (http://spark.apache.org/downloads.html) and unpack it on your machine.
 
-To run a self contained example from the base of this cloned repository using  data in the data/ directory, execute the command from the base of this clone repository:
+To run a self contained example using  data in the data/ directory, execute this command from the base of this clone repository, to run the jar using spark-submit:
 
 ```
   ./YOUR_SPARK_HOME/bin/spark-submit   \
@@ -53,7 +53,7 @@ To run a self contained example from the base of this cloned repository using  d
        data/chr22vcf.adam 8 output_analysis_chr22_probes100
 ```
 
-The four command line parameters defined by their order are:
+The four command line parameters follwing the jar are defined by their order are:
 ```
 <listOfProbes> <vcfdata> <numOfSparkPartitions> <outputDirName>
 ```
@@ -74,7 +74,7 @@ described at: (http://spark.apache.org/docs/1.2.1/programming-guide.html#deployi
 ./spark-ec2 --key-pair myekeypairname --identity-file mkeypairname.pem  --region=us-east-1 --zone=us-east-1b --hadoop-major-version 2   --spark-version=1.2.0 -s 4 --instance-type=m3.large  launch myclustername1
 ```
 
-Note, due to an python codec error regarding UTF8, it was necessary to add the following code to to spark_ec.py after the import statements at the beginning of the script:
+Note, due to a python codec error regarding UTF8 repoted when running spark_ec2.py on my Ubuntu machine, it was necessary to add the following code to to spark_ec.py after the import statements at the beginning of the script:
 
 ```
 reload(sys)  
@@ -99,8 +99,8 @@ Analysis time scales linearly with addition of Spark executors (cores), there is
 
 |             | 32 cores | 16 cores | 8 cores | local - quadcore HT  |
 | ----------- | -------- |:--------:|:-------:|:---------------------:|
-| 100 pheno   | 2.7      | pending  | 8.32    | 15.5                  |
-| 1000 pheno  | 15.7     | pending  | 55.1    | 74.9                  |
+| 100 pheno   | 2.7      | 4.0      | 8.32    | 15.5                  |
+| 1000 pheno  | 15.7     | 29.2     | 55.1    | 74.9                  |
 | 5000 pheno  | 76.7     | pending  | failed* | not attempted         |
 | 10000 pheno | failed*  | pending  | 94      | not attempted         |
 
