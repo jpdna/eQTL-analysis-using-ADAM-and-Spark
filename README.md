@@ -94,22 +94,30 @@ As expected, scales linerally with number of variants, numbers below are approx 
 
 ### Comparison with PLINK
 
-PLINK is a standard tool used by genetics researchers, implementing a vast number of statistical tests.
+[PLINK](http://pngu.mgh.harvard.edu/~purcell/plink/) is a standard tool used by genetics researchers, implementing a vast number of statistical tests.
 
-PLINK's linear regression test was used as benchmark for comparison.
+PLINK's linear regression test was used as benchmark for comparison, using the parameters:
+```
+plink -tfile mystudy --out run_chr22_10000_pheno  --linear --pheno out1_10000_pheno --all-pheno --noweb --pfilter 1e-4  
+```
 
+The VCF file was converted to PLINK using VCFtools with command:
+```
 
-Spot checking results indicate agreement within rounding error.
+```
+
+Spot checking results indicate agreement within rounding error bewteen results generated here and PLINK.
 
 PLINK is a single threaded application.  
-Using the same test set of 10000 phenotypes and 78000 chr 22 variants above requring 135 minutes on the local machine, a single instances of PLINK finishes in XXXX minutes.  Scaled to 8 independent threads, as the job can be arbitaritly split, PLINK would finish in XXXX, however on a single machine there appear to be contention for resources between theads.   PLINK is thus X times faster, not surpring given its C implementation, however signficant work is required to manage jobs on a cluster and recover from error, and recombine results, exactly what Spark does for us.
+Using the same test set of 10000 phenotypes and 78000 chr 22 variants above requring 135 minutes on the local machine, a single instances of PLINK finishes in 320 minutes.  Scaled to 8 independent threads, as the job can be arbitaritly split, with 8 threads PLINK would finish in 40 minutes compared to 94 minutes using 8 cores on AWS EC2 in test above.   PLINK is thus 2.35 times faster than this program, not surpring given its C implementation. However using PLINK this way would require signficant work to manage jobs on a cluster and recover from error, and recombine results, exactly what Spark does for us.   
 
 
 Todo: 
 * Increase the number of samples to assess scaling properties of the initial groupBy phase
 * Determine the cause of failure seen above at chr2 10000 pheno 32 core, and chr 22 5000 pheno 16 core 
 * Empirical and machine learning methods to assess significance / reduce search space
-
+* Implement further statistical tests, modeled after those available in PLINK and other tools.
+*
 #### Note on statistical signifcance
 This project demonstrates a way to efficiently parallelize statistical tests using Spark, however scientific interpretation requires adjustment for the many millions of tests performed.  Corrections need to be made to establish statistical signfificance.  These can be based on prior hypothesis such that variants in same region (cis-acting) or in a regulartory netowrk may interact.  Machine learning based network analysis has been applied to this probelm in the past and may be fruitful area for exploration with Spark. 
 
