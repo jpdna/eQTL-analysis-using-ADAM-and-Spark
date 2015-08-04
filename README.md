@@ -81,11 +81,11 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 ```
 
-Results from AWS scalability testing
+#####Results from AWS scalability testing
 
 Linear regresion against 100, 1000, 5000, 10000 gene expression phenotypes
 
-######Analyzing ~77,000 variants from chr2  (*Times in Minutes*)
+######Analyzing ~77,000 variants from chromosome 22  (*Times in Minutes*)
 |             | 32 cores | 16 cores | 8 cores | local - quadcore HT  |
 | ----------- | -------- |:--------:|:-------:|:---------------------:|
 | 100 pheno   | 1.5      | 1.92     | 1.96    | 2.02                  |
@@ -93,9 +93,9 @@ Linear regresion against 100, 1000, 5000, 10000 gene expression phenotypes
 | 5000 pheno  | 13.9     | 23.29    | 47.1    | pending               |
 | 10000 pheno | 27.7     | pending  | 94      | 135.1                 |
 
-Analysis time scales linearly with addition of processors, there is a constant cost to load or sort genotypes at beginning that needs to be analyzed with the addition of more samples
+Analysis time scales linearly with addition of Spark executors (cores), there is a constant cost to load or sort genotypes at beginning that needs to be analyzed with the addition of more samples
 
-######Analyzing ~450,000 variants from chr2  (*Times in Minutes*)
+######Analyzing ~450,000 variants from chromosome 2  (*Times in Minutes*)
 
 |             | 32 cores | 16 cores | 8 cores | local - quadcore HT  |
 | ----------- | -------- |:--------:|:-------:|:---------------------:|
@@ -104,7 +104,7 @@ Analysis time scales linearly with addition of processors, there is a constant c
 | 5000 pheno  | 76.7     | pending  | failed* | not attempted         |
 | 10000 pheno | failed*  | pending  | 94      | not attempted         |
 
-As expected, scales linerally with number of variants, numbers below are approx (478,000/78,000) = 5.5 times those in above table
+As expected, the computation scales linerally with number of variants, numbers below are approx (478,000/78,000) = 5.5 times those in above table
 
 *runs failed repeat, just terminated leaving only _temporary marker, suspiciously ended at 2.2 hour.  Requires further investigation, machines appear to have plenty of total memory unused near time of failure.
 
@@ -112,19 +112,19 @@ As expected, scales linerally with number of variants, numbers below are approx 
 
 [PLINK](http://pngu.mgh.harvard.edu/~purcell/plink/) is a standard tool used by genetics researchers, implementing a vast number of statistical tests.
 
-PLINK's linear regression test was used as benchmark for comparison, using the parameters:
+PLINK's linear regression test was used here as benchmark for comparison, using the parameters:
 ```
 plink -tfile mystudy --out run_chr22_10000_pheno  --linear --pheno out1_10000_pheno --all-pheno --noweb --pfilter 1e-4  
 ```
 
-The VCF file was converted to PLINK using VCFtools with command:
+The VCF file was converted to PLINK using (VCFtools)[https://vcftools.github.io/index.html] with command:
+```
+vcftools --vcf myVCFfile.vcf --plink-tped
 ```
 
-```
+Spot checking results indicate agreement within rounding error between results generated in this project and PLINK, though further comparison is needed.
 
-Spot checking results indicate agreement within rounding error between results generated here and PLINK.
-
-Using the same test set of 10000 phenotypes and 78000 chr 22 variants above requiring 135 minutes on the local machine, a single instances of PLINK finishes in 320 minutes.  
+Using the same test set of 10000 phenotypes and 77000 chr 22 variants above, a single instance of PLINK finishes in 320 minutes.  
 
 PLINK is a single threaded application.   Scaled to 8 independent threads, as the job can be trivially split by batches of variants, using 8 threads PLINK would finish in 40 minutes compared to 94 minutes using 8 cores on AWS EC2 in test above. 
 
@@ -134,12 +134,12 @@ PLINK is thus 2.35 times faster per thread, not surprising given its C implement
 ###Todo: 
 * Increase the number of samples to assess scaling properties of the initial groupBy phase
 * Determine the cause of failure seen above at chr2 10000 pheno 32 core, and chr 22 5000 pheno 16 core 
-* Implement further statistical tests, modeled after those available in PLINK and other tools. 
+* Implement further statistical tests beyond linear regression, motivated those available in PLINK and other tools 
 * Empirical and machine learning methods to assess significance / reduce search space as described below
 
 
 ##### Note on statistical signifcance
-This project demonstrates a way to efficiently parallelize statistical tests using Spark, however scientific interpretation requires adjustment for the many millions of tests performed.  Corrections need to be made to deterime global statistical significance.  Corrections could be based on prior hypothesis such that variants in same region (cis-acting) or in a regulatory network may interact.  Machine learning based network analysis has been applied to this problem in the past and may be fruitful area for exploration with Spark. 
+This project demonstrates a way to efficiently parallelize statistical tests using Spark, however scientific interpretation requires adjustment for the billions of tests performed.  Corrections could be based on prior hypotheses such that variants often affect expression in genes in the same region (cis-acting) or those variants in genes in known regulatory network may interact.  Machine-learning based network analysis has been applied to this problem in the past and may be fruitful area for exploration with Spark. 
 
 #Credits
 Inspirations, including structure of maven project from:
