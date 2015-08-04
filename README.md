@@ -5,7 +5,7 @@ This demonstration program performs linear regression of genotype vs.
 gene expression phenotypes (eQTLs), making use of ADAM Parquet Genotype file format as input, and Spark.
 
 Projects used here include:
-* ADAM from Big Data Genomics
+* [ADAM](https://github.com/bigdatagenomics/adam) from [Big Data Genomics](http://bdgenomics.org)
 * Spark
 * Apache math3 commons java package
 
