@@ -10,22 +10,22 @@ Projects used here include:
 * [Apache Commons Math](http://commons.apache.org/proper/commons-math/)  java package
 
 # Background
-In statistical genetics, associations tests are often performed between genotype and phenotype.  In the case of a continuous trait such as height, linear regression can be used to associate the dosage (zero, one, or two copies) of an alternative allele at a position in the genome with a quantitative trait.  
+In genetics, statistical association tests are performed between genotype and phenotype.  In the case of a continuous trait such as height, linear regression can be used to associate the dosage (zero, one, or two copies) of an alternative allele at a position in the genome with a quantitative trait.  
 
-Over the past decade it has become possible to measure simultaneously thousands of molecular gene expression phenotypes, the amount of a gene transcript made by a cells (or a cultured cell line) derived from a specific person, and to associate that molecular phenotype with genetic variation within a sample population.   Thes studies are often termed (eQTL) for expression quantitative trait loci studies.
+Over the past decade it has become possible to measure simultaneously thousands of molecular gene expression phenotypes, the amount of a gene transcript made by a cells derived from a specific person, and to associate this molecular phenotype with genetic variation within a population of samples. These studies are often termed (eQTL) for expression Quantitative Trait Loci studies.
 
-In this demonstration program, genotypes are formated into the efficient ADAM genotype format using Parquet and then Spark is used to perform hundreds of millions of linear regression tests.  
+In this demonstration program, genotypes are input fromthe efficient ADAM genotype format which uses Parquet, and then Spark is used to perform billions of linear regression tests.  
 
-For example, in tests described below 450,000 variants with an alternative allele frequency between 10 and 90% are analyzed against 5000 gene exprssion phenotypes in a population of 54 individuals.   Thus, there is a need to perform 450,000 * 5000 = 2.25 billion statistical tests.  
+For example, in the tests described below 450,000 variants from chr2 having an alternative allele frequency between 10 and 90% in the European population are analyzed against 5000 gene expression phenotypes in a population of 54 individuals.   Thus, there is a need to perform 450,000 * 5000 = 2.25 billion statistical tests.  
 
-As discussed in the note at end, dealing with the multiple testing problem in interpreting the output of these tests, is another area where Spark could be applied.
+As discussed in the notes at end, dealing with the multiple testing problem in interpreting the output of these tests, is another area where Spark could be applied.
 
 
 # Source Data and References
 
-Datasets analyzed here are derived from those at: (http://jungle.unige.ch/rnaseq_CEU60/)
+Datasets analyzed here are derived from: (http://jungle.unige.ch/rnaseq_CEU60/)
 
-Cited in the paper: (http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3836232/)
+Described in the paper: (http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3836232/)
 
 #Building
 
@@ -41,10 +41,10 @@ This will produce the JAR file target/uberScalajar-Spark_eQTL_assoc-0.1-SNAPSHOT
 #Running
 Download Spark version 1.2.0 (http://spark.apache.org/downloads.html) and unpack it on your machine.
 
-To run from the base of this cloned repository using example chr22 and chr2 data in the data/ directory, example usage:
+To run a self contained example from the base of this cloned repository using example chr22 and chr2 data in the data/ directory, execute the command from the base of this clone repository:
 
 ```
-YOUR_SPARK_HOME/bin/spark-submit YOUR_SPARK_HOME/bin/spark-submit   \
+  ./YOUR_SPARK_HOME/bin/spark-submit   \
      --class "org.justinpaschall.EQTLAssoc" \
      --master local[*]   \
      --driver-memory 4G \
@@ -66,6 +66,18 @@ Code and data were deployed on AWS EC2, and tested using
 * 16 executors with 16 Spark partitions ( 8 m3.large - 16 cores )
 * 8 executors with 8 Spark partitions ( 4 m3.large - 8 cores )
 * Local machine with 8 Spark partitions ( 1 quadcore HT )
+
+AWS EC2 cluster was launched using the spar_ec2 scripting found at YOUR_SPARK_HOME/  /ec2/
+'''
+
+'''
+
+Note, due to an error UTF8, it was neccesary to add the following code to to spark_ec
+'''
+Reset(sys)
+''
+
+Results from AWS scalability testing
 
 Linear regresion against 100, 1000, 5000, 10000 gene expression phenotypes
 
