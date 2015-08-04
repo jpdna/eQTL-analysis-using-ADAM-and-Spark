@@ -1,8 +1,7 @@
 # Introduction
 Analysis of genotypes and gene expression phenotype (eQTLs) using ADAM and Spark
 
-This demonstration program performs linear regression of genotype vs.
-gene expression phenotypes (eQTLs), making use of ADAM Parquet Genotype file format as input, and Spark.
+This demonstration program performs linear regression of genotype against gene expression phenotypes (eQTLs), making use of ADAM Parquet Genotype file format as input, and Spark.
 
 Projects used here include:
 * [ADAM](https://github.com/bigdatagenomics/adam) from [Big Data Genomics](http://bdgenomics.org)
@@ -14,7 +13,7 @@ In genetics, statistical association tests are performed between genotype and ph
 
 Over the past decade it has become possible to measure simultaneously thousands of molecular gene expression phenotypes, the amount of a gene transcript made by a cells derived from a specific person, and to associate this molecular phenotype with genetic variation within a population of samples. These studies are often termed (eQTL) for expression Quantitative Trait Loci studies.
 
-In this demonstration program, genotypes are input fromthe efficient ADAM genotype format which uses Parquet, and then Spark is used to perform billions of linear regression tests.  
+In this demonstration program, genotypes are input from the efficient ADAM genotype format which uses Parquet, and then Spark is used to perform billions of linear regression tests.  
 
 For example, in the tests described below 450,000 variants from chr2 having an alternative allele frequency between 10 and 90% in the European population are analyzed against 5000 gene expression phenotypes in a population of 54 individuals.   Thus, there is a need to perform 450,000 * 5000 = 2.25 billion statistical tests.  
 
@@ -72,7 +71,7 @@ AWS EC2 cluster was launched using the spar_ec2 scripting found at YOUR_SPARK_HO
 
 '''
 
-Note, due to an error UTF8, it was neccesary to add the following code to to spark_ec
+Note, due to an error UTF8, it was necessary to add the following code to to spark_ec
 '''
 Reset(sys)
 ''
@@ -89,7 +88,7 @@ Linear regresion against 100, 1000, 5000, 10000 gene expression phenotypes
 | 5000 pheno  | 13.9     | 23.29    | 47.1    | pending               |
 | 10000 pheno | 27.7     | pending  | 94      | 135.1                 |
 
-Analysis time scales linearally with addition of processors, there is a constant cost to load or sort genotypes at beginning that needs to be analyzed with the addition of more samples
+Analysis time scales linearly with addition of processors, there is a constant cost to load or sort genotypes at beginning that needs to be analyzed with the addition of more samples
 
 ######Analyzing ~450,000 variants from chr2  (*Times in Minutes*)
 
@@ -102,7 +101,7 @@ Analysis time scales linearally with addition of processors, there is a constant
 
 As expected, scales linerally with number of variants, numbers below are approx (478,000/78,000) = 5.5 times those in above table
 
-*failed runs repeatidly just terminated in AWS, suspicously both at 2.2 hours, needs futher investigation, machines appear to have plenty of total memory unused near time of failure
+*runs failed repeat, just terminated leaving only _temporary marker, suspiciously ended at 2.2 hour.  Requires further investigation, machines appear to have plenty of total memory unused near time of failure.
 
 ### Comparison with PLINK
 
@@ -118,13 +117,13 @@ The VCF file was converted to PLINK using VCFtools with command:
 
 ```
 
-Spot checking results indicate agreement within rounding error bewteen results generated here and PLINK.
+Spot checking results indicate agreement within rounding error between results generated here and PLINK.
 
-Using the same test set of 10000 phenotypes and 78000 chr 22 variants above requring 135 minutes on the local machine, a single instances of PLINK finishes in 320 minutes.  
+Using the same test set of 10000 phenotypes and 78000 chr 22 variants above requiring 135 minutes on the local machine, a single instances of PLINK finishes in 320 minutes.  
 
-PLINK is a single threaded application.   Scaled to 8 independent threads, as the job can be arbitaritly split, with 8 threads PLINK would finish in 40 minutes compared to 94 minutes using 8 cores on AWS EC2 in test above. 
+PLINK is a single threaded application.   Scaled to 8 independent threads, as the job can be trivially split by batches of variants, using 8 threads PLINK would finish in 40 minutes compared to 94 minutes using 8 cores on AWS EC2 in test above. 
 
-PLINK is thus 2.35 times faster, not surpring given its C implementation. However using PLINK in parallel on a cluster in this way would require signficant work to launch and manage jobs, recover from error, and recombine results, exactly what Spark does for us.   
+PLINK is thus 2.35 times faster per thread, not surprising given its C implementation. However using PLINK in parallel on a cluster would require significant work to launch and manage jobs, recover from error, and recombine results, exactly what Spark does for us.   
 
 
 ###Todo: 
@@ -135,10 +134,10 @@ PLINK is thus 2.35 times faster, not surpring given its C implementation. Howeve
 
 
 ##### Note on statistical signifcance
-This project demonstrates a way to efficiently parallelize statistical tests using Spark, however scientific interpretation requires adjustment for the many millions of tests performed.  Corrections need to be made to establish statistical signfificance.  These can be based on prior hypothesis such that variants in same region (cis-acting) or in a regulartory netowrk may interact.  Machine learning based network analysis has been applied to this probelm in the past and may be fruitful area for exploration with Spark. 
+This project demonstrates a way to efficiently parallelize statistical tests using Spark, however scientific interpretation requires adjustment for the many millions of tests performed.  Corrections need to be made to deterime global statistical significance.  Corrections could be based on prior hypothesis such that variants in same region (cis-acting) or in a regulatory network may interact.  Machine learning based network analysis has been applied to this problem in the past and may be fruitful area for exploration with Spark. 
 
 #Credits
-Inspirations, including structure of this README and maven project from:
+Inspirations, including structure of maven project from:
 (https://github.com/nfergu/popstrat)
 
 Keep watching the exciting work of [Big Data Genomics](http://bdgenomics.org)
