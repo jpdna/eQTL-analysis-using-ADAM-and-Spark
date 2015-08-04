@@ -6,8 +6,8 @@ gene expression phenotypes (eQTLs), making use of ADAM Parquet Genotype file for
 
 Projects used here include:
 * [ADAM](https://github.com/bigdatagenomics/adam) from [Big Data Genomics](http://bdgenomics.org)
-* Spark
-* Apache math3 commons java package
+* [Apache Spark](https://spark.apache.org/): a fast engine for large-scale data processing
+* [Apache Commons Math](http://commons.apache.org/proper/commons-math/)  java package
 
 # Background
 In statistical genetics, associations tests are often performed between genotype and phenotype.  In the case of a continuous trait such as height, linear regression can be used to associate the dosage (zero, one, or two copies) of an alternative allele at a position in the genome with a quantitative trait.  
@@ -105,18 +105,16 @@ PLINK is a single threaded application.
 Using the same test set of 10000 phenotypes and 78000 chr 22 variants above requring 135 minutes on the local machine, a single instances of PLINK finishes in XXXX minutes.  Scaled to 8 independent threads, as the job can be arbitaritly split, PLINK would finish in XXXX, however on a single machine there appear to be contention for resources between theads.   PLINK is thus X times faster, not surpring given its C implementation, however signficant work is required to manage jobs on a cluster and recover from error, and recombine results, exactly what Spark does for us.
 
 
-
-
 Todo: 
 * Increase the number of samples to assess scaling properties of the initial groupBy phase
 * Determine the cause of failure seen above at chr2 10000 pheno 32 core, and chr 22 5000 pheno 16 core 
 * Empirical and machine learning methods to assess significance / reduce search space
 
 #### Note on statistical signifcance
-This project demonstrates a way to efficiently parallelize these statistical tests using Spark, however scientific interpretation requires adjustment for the many millions of tests performed.  Corrections need to be made to ascertain signfificance based on prior hypothesis or otherwise the number of tests need to limited - often first (cis-acting) eQTLs are considered where the variant is in or near the gene for which expression is being tested for association.  An adaptive machine learning approach also using Spark may be a good option to narrow this search space, or to adaptively expand the search based on network analysis.
+This project demonstrates a way to efficiently parallelize statistical tests using Spark, however scientific interpretation requires adjustment for the many millions of tests performed.  Corrections need to be made to establish statistical signfificance.  These can be based on prior hypothesis such that variants in same region (cis-acting) or in a regulartory netowrk may interact.  Machine learning based network analysis has been applied to this probelm in the past and may be fruitful area for exploration with Spark. 
 
 #Credits
-Inspirations, including structure of this README from:
+Inspirations, including structure of this README and maven project from:
 (https://github.com/nfergu/popstrat)
 
 Keep watching the exciting work of [Big Data Genomics](http://bdgenomics.org)
