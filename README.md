@@ -1,7 +1,7 @@
 # Introduction
 Analysis of genotypes and gene expression phenotypes (eQTLs) using ADAM and Spark
 
-This demonstration program performs linear regression of genotype against gene expression phenotypes (eQTL analysis), making use of ADAM Parquet Genotype file format as input, and Spark to perform computation which scales easily on cloud compute clusters.
+This demonstration program performs linear regression of genotypes against gene expression phenotypes (eQTL analysis), making use of ADAM Parquet Genotype file format as input, and Spark to perform computation which scales easily on cloud compute clusters.
 
 Technologies used here include:
 * [ADAM](https://github.com/bigdatagenomics/adam) from [Big Data Genomics](http://bdgenomics.org)
@@ -52,13 +52,13 @@ To run a self contained example using  data in the data/ directory, execute this
        data/chr22vcf.adam 8 output_analysis_chr22_probes100
 ```
 
-This job runs for 114 seccods on my machine.  Output is found in directory *output_analysis_chr22_probes100* divided into parition files written by Spark.  Output data is text in the form of tuples:
+This job runs for 114 seconds on my machine.  Output is found in directory *output_analysis_chr22_probes100* divided into partition files written by Spark.  Output data is text in the form of tuples:
 
 ```
 (chr_pos_allele, geneExpressionProbeName, Pvalue, Rsquared)
 ```
 
-The four command line parameters following the jar, defined by their order are:
+The four command line parameters following the jar, defined by the order they appear are:
 ```
 <listOfProbes> <vcfdata> <numOfSparkPartitions> <outputDirName>
 ```
@@ -79,7 +79,9 @@ described at: (http://spark.apache.org/docs/1.2.1/programming-guide.html#deployi
 ./spark-ec2 --key-pair myekeypairname --identity-file mkeypairname.pem  --region=us-east-1 --zone=us-east-1b --hadoop-major-version 2   --spark-version=1.2.0 -s 4 --instance-type=m3.large  launch myclustername1
 ```
 
-Note, due to a python codec error regarding UTF8 when running spark_ec2.py on my Ubuntu machine, it was necessary to add the following code to spark_ec.py after the import statements at the beginning of the script:
+Only the genotype file such as chr2vcf.adam should be copied to ephemeral-hdfs, the others remain local to driver
+
+Note, due to a Python codec error regarding UTF8 when running spark_ec2.py on my Ubuntu machine, it was necessary to add the following code to spark_ec.py after the import statements at the beginning of the script:
 
 ```
 reload(sys)  
@@ -88,7 +90,7 @@ sys.setdefaultencoding('utf8')
 
 #####Results from AWS scalability testing
 
-Linear regression against 100, 1000, 5000, 10000 gene expression phenotypes
+#####Linear regression against 100, 1000, 5000, 10000 gene expression phenotypes
 
 ######Analyzing ~77,000 variants from chromosome 22  (*Times in Minutes*)
 |             | 32 cores | 16 cores | 8 cores | local - quadcore HT  |
@@ -109,7 +111,7 @@ Analysis time scales linearly with addition of Spark executors (cores).  There i
 | 5000 pheno  | 76.7     | 134.3    | failed*   | not tried             |
 | 10000 pheno | failed*  | not tried| not tried | not tried             |
 
-As expected, the computation scales linerally with number of variants, numbers in the second table above are approx (478,000/78,000) = 5.5 times those in above table
+As expected, the computation scales linearly with number of variants, numbers in the second table above are approx (478,000/78,000) = 5.5 times those in above table
 
 *runs failed repeatedly, terminated leaving only _temporary marker, suspiciously both ended at 2.2 hours.  Requires further investigation, machines appear to have plenty of total memory unused near time of failure.
 
@@ -127,16 +129,16 @@ The VCF input file was converted to PLINK format using (VCFtools)[https://vcftoo
 vcftools --vcf myVCFfile.vcf --plink-tped
 ```
 
-Spot checking pvalue results indicate agreement within rounding error between results generated in this project and PLINK, though further comparison is needed.
+Spot checking p-value results indicate agreement within rounding error between results generated in this project and PLINK, though further comparison is needed.
 
-Using the same test set of 10000 phenotypes and 77000 chr 22 variants above, a single instance of PLINK finishes in 320 minutes.  
+Using the same test set of 10000 phenotypes and 77000 chromosome 22 variants above, a single instance of PLINK finishes in 320 minutes.  
 
 PLINK is a single threaded application.   Scaled to 8 independent threads, as the PLINK job can be split by batches of variants, 8 independent threads running PLINK would finish this task in 40 minutes compared to 94 minutes using 8 cores on AWS EC2 in test above. 
 
-PLINK is thus 2.35 times faster per thread, not surprising given its C implementation. However using PLINK in parallel on a cluster could require significant work to launch and manage jobs, recover from error, and recombine results, exactly what Spark does for us.   
+PLINK is thus 2.35 times faster per thread, not surprising given its implementation in C. However using PLINK in parallel on a cluster could require significant work to launch and manage jobs, recover from error, and recombine results, exactly what Spark does for us.   
 
 
-###Todo: 
+###To do: 
 * Increase the number of samples to assess scaling properties of the initial groupBy phase
 * Determine the cause of failure seen above at chr2 10000 pheno 32 core, and chr 22 5000 pheno 16 core 
 * Implement further statistical tests beyond linear regression, motivated by those in PLINK and other tools 
@@ -144,7 +146,7 @@ PLINK is thus 2.35 times faster per thread, not surprising given its C implement
 
 
 ##### Note on statistical signifcance
-This project demonstrates a way to efficiently and scalably parallelize statistical tests using Spark, however scientific interpretation requires adjustment for the billions of tests performed.  Corrections could be based on prior hypotheses such as that variants often affect expression in genes in the same region (cis-acting) or that variants in genes in known regulatory network may interact.  Machine-learning based network analysis has been applied to this problem in the past and may be fruitful area for exploration with Spark. 
+This project demonstrates a way to efficiently and scalably perform parallel statistical tests using Spark, however scientific interpretation requires adjustment for the billions of tests performed.  Corrections could be based on prior hypotheses: for example that variants often affect expression in genes in the same region (cis-acting) or that variants in genes in known regulatory networks may interact.  Machine-learning based network analysis has been applied to this problem in the past and may be fruitful area for exploration with Spark. 
 
 #Credits
 Inspirations, including structure of maven project from:
