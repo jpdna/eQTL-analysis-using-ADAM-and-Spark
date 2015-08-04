@@ -53,28 +53,34 @@ To run a self contained example using  data in the data/ directory, execute this
        data/chr22vcf.adam 8 output_analysis_chr22_probes100
 ```
 
-The four command line parameters follwing the jar are defined by their order are:
+This runs for 114 seccods on my machine.  Output is found in directory *output_analysis_chr22_probes100* divided into parition files written by Spark.  Output data is text in th form of tuples:
+
+```
+(chr_pos_allele, geneExpressionProbeName, Pvalue, Rquared)
+```
+
+The four command line parameters follwing the jar, defined by their order are:
 ```
 <listOfProbes> <vcfdata> <numOfSparkPartitions> <outputDirName>
 ```
 
 # Deploying and Testing Scalability on AWS EC2
 
-Code and data were deployed on AWS EC2, and tested using
+Code and data were deployed on AWS EC2, and scaling properties tested using
 
 * 32 executors with 32 Spark partitions ( 16 m3.large - 32 cores )
 * 16 executors with 16 Spark partitions ( 8 m3.large - 16 cores )
 * 8 executors with 8 Spark partitions ( 4 m3.large - 8 cores )
 * Local machine with 8 Spark partitions ( 1 quadcore HT )
 
-AWS EC2 cluster was launched using the spark_ec2 script found at YOUR_SPARK_HOME/ec2/spark-ec2
+AWS EC2 clusters was launched using the spark_ec2 script found at YOUR_SPARK_HOME/ec2/spark-ec2
 described at: (http://spark.apache.org/docs/1.2.1/programming-guide.html#deploying-to-a-cluster)
 
 ```
 ./spark-ec2 --key-pair myekeypairname --identity-file mkeypairname.pem  --region=us-east-1 --zone=us-east-1b --hadoop-major-version 2   --spark-version=1.2.0 -s 4 --instance-type=m3.large  launch myclustername1
 ```
 
-Note, due to a python codec error regarding UTF8 repoted when running spark_ec2.py on my Ubuntu machine, it was necessary to add the following code to to spark_ec.py after the import statements at the beginning of the script:
+Note, due to a python codec error regarding UTF8 when running spark_ec2.py on my Ubuntu machine, it was necessary to add the following code to spark_ec.py after the import statements at the beginning of the script:
 
 ```
 reload(sys)  
@@ -83,7 +89,7 @@ sys.setdefaultencoding('utf8')
 
 #####Results from AWS scalability testing
 
-Linear regresion against 100, 1000, 5000, 10000 gene expression phenotypes
+Linear regression against 100, 1000, 5000, 10000 gene expression phenotypes
 
 ######Analyzing ~77,000 variants from chromosome 22  (*Times in Minutes*)
 |             | 32 cores | 16 cores | 8 cores | local - quadcore HT  |
@@ -93,20 +99,20 @@ Linear regresion against 100, 1000, 5000, 10000 gene expression phenotypes
 | 5000 pheno  | 13.9     | 23.29    | 47.1    | pending               |
 | 10000 pheno | 27.7     | pending  | 94      | 135.1                 |
 
-Analysis time scales linearly with addition of Spark executors (cores), there is a constant cost to load or sort genotypes at beginning that needs to be analyzed with the addition of more samples
+Analysis time scales linearly with addition of Spark executors (cores).  There is a constant cost to load or sort genotypes at beginning that needs to be analyzed with the addition of more samples.
 
 ######Analyzing ~450,000 variants from chromosome 2  (*Times in Minutes*)
 
 |             | 32 cores | 16 cores | 8 cores | local - quadcore HT  |
-| ----------- | -------- |:--------:|:-------:|:---------------------:|
-| 100 pheno   | 2.7      | 4.0      | 8.32    | 15.5                  |
-| 1000 pheno  | 15.7     | 29.2     | 55.1    | 74.9                  |
-| 5000 pheno  | 76.7     | pending  | failed* | not attempted         |
-| 10000 pheno | failed*  | pending  | 94      | not attempted         |
+| ----------- | -------- |:--------:|:---------:|:---------------------:|
+| 100 pheno   | 2.7      | 4.0      | 8.32      | 15.5                  |
+| 1000 pheno  | 15.7     | 29.2     | 55.1      | 74.9                  |
+| 5000 pheno  | 76.7     | pending  | failed*   | not tried             |
+| 10000 pheno | failed*  | pending  | not tried | not tried             |
 
-As expected, the computation scales linerally with number of variants, numbers below are approx (478,000/78,000) = 5.5 times those in above table
+As expected, the computation scales linerally with number of variants, numbers in the second table above are approx (478,000/78,000) = 5.5 times those in above table
 
-*runs failed repeat, just terminated leaving only _temporary marker, suspiciously ended at 2.2 hour.  Requires further investigation, machines appear to have plenty of total memory unused near time of failure.
+*runs failed repeatedly, terminated leaving only _temporary marker, suspiciously both ended at 2.2 hours.  Requires further investigation, machines appear to have plenty of total memory unused near time of failure.
 
 ### Comparison with PLINK
 
@@ -117,29 +123,29 @@ PLINK's linear regression test was used here as benchmark for comparison, using 
 plink -tfile mystudy --out run_chr22_10000_pheno  --linear --pheno out1_10000_pheno --all-pheno --noweb --pfilter 1e-4  
 ```
 
-The VCF file was converted to PLINK using (VCFtools)[https://vcftools.github.io/index.html] with command:
+The VCF input file was converted to PLINK format using (VCFtools)[https://vcftools.github.io/index.html] with command:
 ```
 vcftools --vcf myVCFfile.vcf --plink-tped
 ```
 
-Spot checking results indicate agreement within rounding error between results generated in this project and PLINK, though further comparison is needed.
+Spot checking pvalue results indicate agreement within rounding error between results generated in this project and PLINK, though further comparison is needed.
 
 Using the same test set of 10000 phenotypes and 77000 chr 22 variants above, a single instance of PLINK finishes in 320 minutes.  
 
-PLINK is a single threaded application.   Scaled to 8 independent threads, as the job can be trivially split by batches of variants, using 8 threads PLINK would finish in 40 minutes compared to 94 minutes using 8 cores on AWS EC2 in test above. 
+PLINK is a single threaded application.   Scaled to 8 independent threads, as the PLINK job can be split by batches of variants, 8 independent threads running PLINK would finish this task in 40 minutes compared to 94 minutes using 8 cores on AWS EC2 in test above. 
 
-PLINK is thus 2.35 times faster per thread, not surprising given its C implementation. However using PLINK in parallel on a cluster would require significant work to launch and manage jobs, recover from error, and recombine results, exactly what Spark does for us.   
+PLINK is thus 2.35 times faster per thread, not surprising given its C implementation. However using PLINK in parallel on a cluster could require significant work to launch and manage jobs, recover from error, and recombine results, exactly what Spark does for us.   
 
 
 ###Todo: 
 * Increase the number of samples to assess scaling properties of the initial groupBy phase
 * Determine the cause of failure seen above at chr2 10000 pheno 32 core, and chr 22 5000 pheno 16 core 
-* Implement further statistical tests beyond linear regression, motivated those available in PLINK and other tools 
+* Implement further statistical tests beyond linear regression, motivated by those in PLINK and other tools 
 * Empirical and machine learning methods to assess significance / reduce search space as described below
 
 
 ##### Note on statistical signifcance
-This project demonstrates a way to efficiently parallelize statistical tests using Spark, however scientific interpretation requires adjustment for the billions of tests performed.  Corrections could be based on prior hypotheses such that variants often affect expression in genes in the same region (cis-acting) or those variants in genes in known regulatory network may interact.  Machine-learning based network analysis has been applied to this problem in the past and may be fruitful area for exploration with Spark. 
+This project demonstrates a way to efficiently parallelize statistical tests using Spark, however scientific interpretation requires adjustment for the billions of tests performed.  Corrections could be based on prior hypotheses such as that variants often affect expression in genes in the same region (cis-acting) or that variants in genes in known regulatory network may interact.  Machine-learning based network analysis has been applied to this problem in the past and may be fruitful area for exploration with Spark. 
 
 #Credits
 Inspirations, including structure of maven project from:
