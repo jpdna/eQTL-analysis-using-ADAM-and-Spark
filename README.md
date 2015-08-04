@@ -16,9 +16,9 @@ Over the past decade it has become possible to measure simultaneously thousands 
 
 In this demonstration program, genotypes are input from the efficient ADAM genotype format which uses Parquet, and then Spark is used to perform billions of linear regression tests.  
 
-For example, in the tests described below 450,000 variants from chr2 having an alternative allele frequency between 10 and 90% in the European population are analyzed against 5000 gene expression phenotypes in a population of 54 individuals.   Thus, there is a need to perform 450,000 * 5000 = 2.25 billion statistical tests.  
+For example, in the a test described below, 450,000 variants from chr2 having an alternative allele frequency between 10 and 90% in the European population are analyzed against 5000 gene expression phenotypes in a population of 54 individuals. Thus, there is a need to perform 450,000 * 5000 = 2.25 billion statistical tests.  
 
-As discussed in the notes at end, dealing with the multiple testing problem in interpreting the output of these tests is another area where Spark could be applied.
+As discussed in the note at the end, the multiple testing problem in interpreting the output of these tests is another area where Spark could be applied.
 
 
 # Source Data and References
@@ -31,7 +31,6 @@ Described in the paper: (http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3836232/)
 
 To build from source first [download and install Maven](http://maven.apache.org/download.cgi).
 Then at the command line in this cloned repository type:
-
 ```
 mvn clean package
 ```
@@ -53,13 +52,13 @@ To run a self contained example using  data in the data/ directory, execute this
        data/chr22vcf.adam 8 output_analysis_chr22_probes100
 ```
 
-This runs for 114 seccods on my machine.  Output is found in directory *output_analysis_chr22_probes100* divided into parition files written by Spark.  Output data is text in th form of tuples:
+This job runs for 114 seccods on my machine.  Output is found in directory *output_analysis_chr22_probes100* divided into parition files written by Spark.  Output data is text in the form of tuples:
 
 ```
-(chr_pos_allele, geneExpressionProbeName, Pvalue, Rquared)
+(chr_pos_allele, geneExpressionProbeName, Pvalue, Rsquared)
 ```
 
-The four command line parameters follwing the jar, defined by their order are:
+The four command line parameters following the jar, defined by their order are:
 ```
 <listOfProbes> <vcfdata> <numOfSparkPartitions> <outputDirName>
 ```
@@ -145,7 +144,7 @@ PLINK is thus 2.35 times faster per thread, not surprising given its C implement
 
 
 ##### Note on statistical signifcance
-This project demonstrates a way to efficiently parallelize statistical tests using Spark, however scientific interpretation requires adjustment for the billions of tests performed.  Corrections could be based on prior hypotheses such as that variants often affect expression in genes in the same region (cis-acting) or that variants in genes in known regulatory network may interact.  Machine-learning based network analysis has been applied to this problem in the past and may be fruitful area for exploration with Spark. 
+This project demonstrates a way to efficiently and scalably parallelize statistical tests using Spark, however scientific interpretation requires adjustment for the billions of tests performed.  Corrections could be based on prior hypotheses such as that variants often affect expression in genes in the same region (cis-acting) or that variants in genes in known regulatory network may interact.  Machine-learning based network analysis has been applied to this problem in the past and may be fruitful area for exploration with Spark. 
 
 #Credits
 Inspirations, including structure of maven project from:
