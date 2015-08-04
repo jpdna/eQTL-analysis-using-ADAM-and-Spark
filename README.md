@@ -107,7 +107,7 @@ Analysis time scales linearly with addition of Spark executors (cores).  There i
 | 100 pheno   | 2.7      | 4.0      | 8.32      | 15.5                  |
 | 1000 pheno  | 15.7     | 29.2     | 55.1      | 74.9                  |
 | 5000 pheno  | 76.7     | 134.3    | failed*   | not tried             |
-| 10000 pheno | failed*  | pending  | not tried | not tried             |
+| 10000 pheno | failed*  | not tried| not tried | not tried             |
 
 As expected, the computation scales linerally with number of variants, numbers in the second table above are approx (478,000/78,000) = 5.5 times those in above table
 
