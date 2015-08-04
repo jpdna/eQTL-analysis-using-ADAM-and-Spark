@@ -108,17 +108,21 @@ The VCF file was converted to PLINK using VCFtools with command:
 
 Spot checking results indicate agreement within rounding error bewteen results generated here and PLINK.
 
-PLINK is a single threaded application.  
-Using the same test set of 10000 phenotypes and 78000 chr 22 variants above requring 135 minutes on the local machine, a single instances of PLINK finishes in 320 minutes.  Scaled to 8 independent threads, as the job can be arbitaritly split, with 8 threads PLINK would finish in 40 minutes compared to 94 minutes using 8 cores on AWS EC2 in test above.   PLINK is thus 2.35 times faster than this program, not surpring given its C implementation. However using PLINK this way would require signficant work to manage jobs on a cluster and recover from error, and recombine results, exactly what Spark does for us.   
+Using the same test set of 10000 phenotypes and 78000 chr 22 variants above requring 135 minutes on the local machine, a single instances of PLINK finishes in 320 minutes.  
+
+PLINK is a single threaded application.   Scaled to 8 independent threads, as the job can be arbitaritly split, with 8 threads PLINK would finish in 40 minutes compared to 94 minutes using 8 cores on AWS EC2 in test above. 
+
+PLINK is thus 2.35 times faster, not surpring given its C implementation. However using PLINK in parallel on a cluster in this way would require signficant work to launch and manage jobs, recover from error, and recombine results, exactly what Spark does for us.   
 
 
-Todo: 
+###Todo: 
 * Increase the number of samples to assess scaling properties of the initial groupBy phase
 * Determine the cause of failure seen above at chr2 10000 pheno 32 core, and chr 22 5000 pheno 16 core 
-* Empirical and machine learning methods to assess significance / reduce search space
-* Implement further statistical tests, modeled after those available in PLINK and other tools.
-*
-#### Note on statistical signifcance
+* Implement further statistical tests, modeled after those available in PLINK and other tools. 
+* Empirical and machine learning methods to assess significance / reduce search space as described below
+
+
+##### Note on statistical signifcance
 This project demonstrates a way to efficiently parallelize statistical tests using Spark, however scientific interpretation requires adjustment for the many millions of tests performed.  Corrections need to be made to establish statistical signfificance.  These can be based on prior hypothesis such that variants in same region (cis-acting) or in a regulartory netowrk may interact.  Machine learning based network analysis has been applied to this probelm in the past and may be fruitful area for exploration with Spark. 
 
 #Credits
