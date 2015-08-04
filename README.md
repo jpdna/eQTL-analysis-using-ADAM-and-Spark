@@ -63,7 +63,7 @@ The four command line parameters following the jar, defined by their order are:
 <listOfProbes> <vcfdata> <numOfSparkPartitions> <outputDirName>
 ```
 
-# Deploying on AWS EC2 and Scalability Metrics
+### Deploying on AWS EC2 and Scalability Metrics
 
 Code and data were deployed on AWS EC2, and scaling properties tested using
 
