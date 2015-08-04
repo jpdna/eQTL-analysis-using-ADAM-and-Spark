@@ -96,7 +96,7 @@ Linear regression against 100, 1000, 5000, 10000 gene expression phenotypes
 | 100 pheno   | 1.5      | 1.92     | 1.96    | 2.02                  |
 | 1000 pheno  | 3.9      | 5.7      | 10.4    | 14.1                  |
 | 5000 pheno  | 13.9     | 23.29    | 47.1    | pending               |
-| 10000 pheno | 27.7     | pending  | 94      | 135.1                 |
+| 10000 pheno | 27.7     | 47       | 94      | 135.1                 |
 
 Analysis time scales linearly with addition of Spark executors (cores).  There is a constant cost to load or sort genotypes at beginning that needs to be analyzed with the addition of more samples.
 
@@ -106,7 +106,7 @@ Analysis time scales linearly with addition of Spark executors (cores).  There i
 | ----------- | -------- |:--------:|:---------:|:---------------------:|
 | 100 pheno   | 2.7      | 4.0      | 8.32      | 15.5                  |
 | 1000 pheno  | 15.7     | 29.2     | 55.1      | 74.9                  |
-| 5000 pheno  | 76.7     | pending  | failed*   | not tried             |
+| 5000 pheno  | 76.7     | 134.3    | failed*   | not tried             |
 | 10000 pheno | failed*  | pending  | not tried | not tried             |
 
 As expected, the computation scales linerally with number of variants, numbers in the second table above are approx (478,000/78,000) = 5.5 times those in above table
