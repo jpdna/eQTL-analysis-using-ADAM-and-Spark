@@ -12,7 +12,7 @@ In this demonstration program, genotypes are formated into the efficient ADAM ge
 
 The genetic association test here is equally applicable to whole body QTLs like height, BMI, blood pressure, eQTLs were chosen as they sheet amount of computation requires a scalable solution.  Another area where Spark could be applied isthe pairwise and greater interaction among variants, which quickly also produces a combinatorial explosion of tests.
 
-Note: demonstrated here is a way to efficiently parallelize these statistical tests using Spark, however scientific interpretation requires adjustment for the many millions of tests performed.  Corrections need to be made to ascertain signfificance based on prior hypothesis or otherwise the number of tests need to limited - often first (cis-acting) eQTLs are considered where the variant is in or near the gene for which expression is being tested for association.  An adaptive machine learning approach also using Spark may be a good option to narrow this search space, or to adaptively expand the search based on network analysis.
+
 
 # Source Data and References
 
@@ -72,7 +72,28 @@ Linear regresion against 100, 1000, 5000, 10000 gene expression phenotypes
 | 5000 pheno  | 13.9     | 23.29    | 47.1    | pending               |
 | 10000 pheno | 27.7     | pending  | 94      | 135.1                 |
 
+Analysis time scales linearally with addition of processors, there is a constant cost to load or sort genotypes at beginning that needs to be analyzed with the addition of more samples
 
+######Analyzing ~454,000 variants from chr2  (*Times in Minutes*)
+
+|             | 32 cores | 16 cores | 8 cores | local - quadcore HT  |
+| ----------- | -------- |:--------:|:-------:|:---------------------:|
+| 100 pheno   | 1.5      | 1.92     | 1.96    | 2.02                  |
+| 1000 pheno  | 3.9      | 5.7      | 10.4    | 14.1                  |
+| 5000 pheno  | 13.9     | 23.29    | 47.1    | pending               |
+| 10000 pheno | 27.7     | pending  | 94      | 135.1                 |
+
+As expected, scales linerally with number of variants, numbers below are approx (478,000/78,000) = 5.5 times those in above table
+
+### Comparison with PLINK
+
+Todo: 
+* Increase the number of samples to assess scaling properties of the initial groupBy phase
+* Determine the cause of failure seen above at chr2 10000 pheno 32 core, and chr 22 5000 pheno 16 core 
+* Empirical and machine learning methods to assess significance / reduce search space
+
+#### Note on statistical signifcance
+Note: demonstrated here is a way to efficiently parallelize these statistical tests using Spark, however scientific interpretation requires adjustment for the many millions of tests performed.  Corrections need to be made to ascertain signfificance based on prior hypothesis or otherwise the number of tests need to limited - often first (cis-acting) eQTLs are considered where the variant is in or near the gene for which expression is being tested for association.  An adaptive machine learning approach also using Spark may be a good option to narrow this search space, or to adaptively expand the search based on network analysis.
 
 #Credits
 Inspirations, including structure of this README from:
