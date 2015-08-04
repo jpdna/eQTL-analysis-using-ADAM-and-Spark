@@ -53,6 +53,27 @@ The four command line parameters defined by their order are
 <listOfProbes> <vcfdata> <numOfSparkPartitions> <outputDirName>
 ```
 
+# Deploying and Testing Scalability on AWS EC2
+
+Code and data were deployed on AWS EC2, and tested using
+
+* 32 executors with 32 Spark partitions ( 16 m3.large - 32 cores )
+* 16 executors with 16 Spark partitions ( 8 m3.large - 16 cores )
+* 8 executors with 8 Spark partitions ( 4 m3.large - 8 cores )
+* Local machine with 8 Spark partitions ( 1 quadcore HT )
+
+Linear regresion against 100, 1000, 5000, 10000 gene expression phenotypes
+
+######Analyzing ~78,000 variants from chr2  (*Times in Minutes*)
+|             | 32 cores | 16 cores | 8 cores | local - quadcore HT  |
+| ----------- | -------- |:--------:|:-------:|:---------------------:|
+| 100 pheno   | 1.5      | 1.92     | 1.96    | 2.02                  |
+| 1000 pheno  | 3.9      | 5.7      | 10.4    | 14.1                  |
+| 5000 pheno  | 13.9     | 23.29    | 47.1    | pending               |
+| 10000 pheno | 27.7     | pending  | 94      | 135.1                 |
+
+
+
 #Credits
 Inspirations, including structure of this README from:
 (https://github.com/nfergu/popstrat)
