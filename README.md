@@ -1,12 +1,13 @@
 # Introduction
-Analysis of genotypes and gene expression phenotype (eQTLs) using ADAM and Spark
+Analysis of genotypes and gene expression phenotypes (eQTLs) using ADAM and Spark
 
-This demonstration program performs linear regression of genotype against gene expression phenotypes (eQTLs), making use of ADAM Parquet Genotype file format as input, and Spark.
+This demonstration program performs linear regression of genotype against gene expression phenotypes (eQTL analysis), making use of ADAM Parquet Genotype file format as input, and Spark to perform computation which scales easily on cloud compute clusters.
 
-Projects used here include:
+Technologies used here include:
 * [ADAM](https://github.com/bigdatagenomics/adam) from [Big Data Genomics](http://bdgenomics.org)
 * [Apache Spark](https://spark.apache.org/): a fast engine for large-scale data processing
 * [Apache Commons Math](http://commons.apache.org/proper/commons-math/)  java package
+* Amazon AWS EC2
 
 # Background
 In genetics, statistical association tests are performed between genotype and phenotype.  In the case of a continuous trait such as height, linear regression can be used to associate the dosage (zero, one, or two copies) of an alternative allele at a position in the genome with a quantitative trait.  
@@ -17,7 +18,7 @@ In this demonstration program, genotypes are input from the efficient ADAM genot
 
 For example, in the tests described below 450,000 variants from chr2 having an alternative allele frequency between 10 and 90% in the European population are analyzed against 5000 gene expression phenotypes in a population of 54 individuals.   Thus, there is a need to perform 450,000 * 5000 = 2.25 billion statistical tests.  
 
-As discussed in the notes at end, dealing with the multiple testing problem in interpreting the output of these tests, is another area where Spark could be applied.
+As discussed in the notes at end, dealing with the multiple testing problem in interpreting the output of these tests is another area where Spark could be applied.
 
 
 # Source Data and References
@@ -40,7 +41,7 @@ This will produce the JAR file target/uberScalajar-Spark_eQTL_assoc-0.1-SNAPSHOT
 #Running
 Download Spark version 1.2.0 (http://spark.apache.org/downloads.html) and unpack it on your machine.
 
-To run a self contained example from the base of this cloned repository using example chr22 and chr2 data in the data/ directory, execute the command from the base of this clone repository:
+To run a self contained example from the base of this cloned repository using  data in the data/ directory, execute the command from the base of this clone repository:
 
 ```
   ./YOUR_SPARK_HOME/bin/spark-submit   \
@@ -52,7 +53,7 @@ To run a self contained example from the base of this cloned repository using ex
        data/chr22vcf.adam 8 output_analysis_chr22_probes100
 ```
 
-The four command line parameters defined by their order are
+The four command line parameters defined by their order are:
 ```
 <listOfProbes> <vcfdata> <numOfSparkPartitions> <outputDirName>
 ```
@@ -66,15 +67,19 @@ Code and data were deployed on AWS EC2, and tested using
 * 8 executors with 8 Spark partitions ( 4 m3.large - 8 cores )
 * Local machine with 8 Spark partitions ( 1 quadcore HT )
 
-AWS EC2 cluster was launched using the spar_ec2 scripting found at YOUR_SPARK_HOME/  /ec2/
-'''
+AWS EC2 cluster was launched using the spark_ec2 script found at YOUR_SPARK_HOME/ec2/spark-ec2
+described at: (http://spark.apache.org/docs/1.2.1/programming-guide.html#deploying-to-a-cluster)
 
-'''
+```
+./spark-ec2 --key-pair myekeypairname --identity-file mkeypairname.pem  --region=us-east-1 --zone=us-east-1b --hadoop-major-version 2   --spark-version=1.2.0 -s 4 --instance-type=m3.large  launch myclustername1
+```
 
-Note, due to an error UTF8, it was necessary to add the following code to to spark_ec
-'''
-Reset(sys)
-''
+Note, due to an python codec error regarding UTF8, it was necessary to add the following code to to spark_ec.py after the import statements at the beginning of the script:
+
+```
+reload(sys)  
+sys.setdefaultencoding('utf8')
+```
 
 Results from AWS scalability testing
 
