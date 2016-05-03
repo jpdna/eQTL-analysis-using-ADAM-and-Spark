@@ -7,7 +7,9 @@ Technologies used here include:
 * [ADAM](https://github.com/bigdatagenomics/adam) from [Big Data Genomics](http://bdgenomics.org)
 * [Apache Spark](https://spark.apache.org/): a fast engine for large-scale data processing
 * [Apache Commons Math](http://commons.apache.org/proper/commons-math/)  java package
-* Amazon AWS EC2
+* Amazon AWS EC2 
+*  [Presentation](https://docs.google.com/presentation/d/1F2jEplq6n36GJNCK_fgrloY3Fi9ujVl1x-sAPUg_DYU/edit#slide=id.g10df2eff66_2_20)
+
 
 # Background
 In genetics, statistical association tests are performed between genotype and phenotype.  In the case of a continuous trait such as height, linear regression can be used to associate the dosage (zero, one, or two copies) of an alternative allele at a position in the genome with a quantitative trait.  
